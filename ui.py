@@ -161,12 +161,12 @@ class Ui:
         sourceVertex = int(input("Source vertex: "))
         targetVertex = int(input("Target vertex: "))
 
-        lowestCostWalk = self.__listOfGraphs[self.__indexOfCurrentGraph].lowestCostWalk(sourceVertex, targetVertex)
-        if lowestCostWalk == float("inf"):
-            print("There is no path between the two vertices!")
+        distance, path = self.__listOfGraphs[self.__indexOfCurrentGraph].bellmanFord(sourceVertex, targetVertex)
+        if distance == float('inf'):
+            print("There is no path between the given vertices!")
         else:
-            print(f"The lowest cost walk between the two vertices is: {lowestCostWalk}")
-        print("Successfully!")
+            print(f"The path is: {path}")
+            print("Successfully!")
 
 
     @staticmethod

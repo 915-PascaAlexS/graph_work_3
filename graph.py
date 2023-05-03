@@ -127,23 +127,33 @@ class DirectedGraph:
         self.__dictionaryOut.pop(givenVertex)
         self.__numberOfVertices -= 1
 
-    def lowestCostWalk(self, sourceVertex, targetVertex):
-        INF = float('inf')
 
-        length = self.getNumberOfVertices
-        d = [[INF] * length for i in range(length)]
-        for i in range(length):
-            d[i][0] = 0
-        for k in range(1, length):
-            for i in range(length):
-                for j in range(length):
-                    try:
-                        if d[i][k] > d[i][k - 1] + self.getCostOfGivenEdge(i, j):
-                            d[i][k] = d[i][k - 1] + self.getCostOfGivenEdge(i, j)
-                    except GraphError:
-                        pass
+    def bellmanFord(self, start: int, end: int):
+        dist = [float('inf')] * self.__numberOfVertices
+        pred = [-1] * self.__numberOfVertices
+        dist[start] = 0
 
-        return d[sourceVertex][targetVertex]
+        for i in range(self.__numberOfVertices - 1):
+            for u in range(self.__numberOfVertices):
+                for v in self.__dictionaryOut[u]:
+                    if dist[u] + self.__dictionaryCost[(u, v)] < dist[v]:
+                        dist[v] = dist[u] + self.__dictionaryCost[(u, v)]
+                        pred[v] = u
+
+        for u in range(self.__numberOfVertices):
+            for v in self.__dictionaryOut[u]:
+                if dist[u] + self.__dictionaryCost[(u, v)] < dist[v]:
+                    return [], []
+
+        path = []
+        current = end
+        while current != start:
+            path.append(current)
+            current = pred[current]
+        path.append(start)
+        path.reverse()
+
+        return dist, path
 
 def readGraphFromTextFile(textFileName):
     fileToReadFrom = open(textFileName, "rt")
