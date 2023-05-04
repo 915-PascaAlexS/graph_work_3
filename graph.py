@@ -1,3 +1,5 @@
+from queue import Queue
+
 from graphError import GraphError
 from random import randint, choice
 
@@ -127,23 +129,32 @@ class DirectedGraph:
         self.__dictionaryOut.pop(givenVertex)
         self.__numberOfVertices -= 1
 
-
     def bellmanFord(self, start: int, end: int):
         dist = [float('inf')] * self.__numberOfVertices
         pred = [-1] * self.__numberOfVertices
         dist[start] = 0
 
-        for i in range(self.__numberOfVertices - 1):
-            for u in range(self.__numberOfVertices):
-                for v in self.__dictionaryOut[u]:
-                    if dist[u] + self.__dictionaryCost[(u, v)] < dist[v]:
-                        dist[v] = dist[u] + self.__dictionaryCost[(u, v)]
-                        pred[v] = u
+        queue = Queue()
+        queue.put(start)
+        inQueue = [False] * self.__numberOfVertices
+        inQueue[start] = True
 
-        for u in range(self.__numberOfVertices):
+        while not queue.empty():
+            u = queue.get()
+            inQueue[u] = False
+
             for v in self.__dictionaryOut[u]:
                 if dist[u] + self.__dictionaryCost[(u, v)] < dist[v]:
-                    return [], []
+                    dist[v] = dist[u] + self.__dictionaryCost[(u, v)]
+                    pred[v] = u
+
+                    if not inQueue[v]:
+                        queue.put(v)
+                        inQueue[v] = True
+
+            # check for negative cycles
+            if queue.qsize() > self.__numberOfVertices:
+                return [], []
 
         path = []
         current = end
